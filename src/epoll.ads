@@ -27,19 +27,31 @@ package Epoll is
             Epoll_Fd : C.int := -1;
         end record;
 
+        subtype EPOLL_CTL_OPS is C.unsigned;
+        EPOLL_CTL_ADD : constant EPOLL_CTL_OPS := 1;
+        EPOLL_CTL_DEL : constant EPOLL_CTL_OPS := 2;
+        EPOLL_CTL_MOD : constant EPOLL_CTL_OPS := 3;
+
+        subtype EPOLL_EVENTS is C.unsigned;
+        EPOLLIN : constant EPOLL_EVENTS := 1;
+        EPOLLPRI : constant EPOLL_EVENTS := 2;
+        EPOLLOUT : constant EPOLL_EVENTS := 4;
+        EPOLLRDNORM : constant EPOLL_EVENTS := 64;
+        EPOLLRDBAND : constant EPOLL_EVENTS := 128;
+        EPOLLWRNORM : constant EPOLL_EVENTS := 256;
+        EPOLLWRBAND : constant EPOLL_EVENTS := 512;
+        EPOLLMSG : constant EPOLL_EVENTS := 1024;
+        EPOLLERR : constant EPOLL_EVENTS := 8;
+        EPOLLHUP : constant EPOLL_EVENTS := 16;
+        EPOLLRDHUP : constant EPOLL_EVENTS := 8192;
+        EPOLLONESHOT : constant EPOLL_EVENTS := 1073741824;
+        EPOLLET : constant EPOLL_EVENTS := -2147483648;
+
+
         type Epoll_Data_Type is (Pointer,
                                 File_Descriptor,
                                 Int_32,
                                 Int_64);
-
-        type Ctl_Operations is (
-                    Ctl_Add,
-                    Ctl_Mod,
-                    Ctl_Del);
-        for Ctl_Operations use (
-                    Ctl_Add => 1,
-                    Ctl_Mod => 2,
-                    Ctl_Del => 3);
 
         type Epoll_Data (D : Epoll_Data_Type := File_Descriptor) is record
             case D is
@@ -53,31 +65,30 @@ package Epoll is
                     u64 : C.int;
             end case;
         end record;
-
+        pragma Convention (C_Pass_By_Copy, Epoll_Data);
         pragma Unchecked_Union (Epoll_Data);
 
         type Epoll_Event is record
             Events : Integer;
             Data : Epoll_Data;
         end record;
-        type Epoll_Event_Ptr is access all Epoll_Event;
+        pragma Convention (C_Pass_By_Copy, Epoll_Event);
 
 
         function Epoll_Create (Size : C.int) return C.int;
 
         function Epoll_Ctl (Epoll_Descriptor : C.int;
-                                Op : C.int;
+                                Op : EPOLL_CTL_OPS;
                                 Descriptor : C.int;
-                                Event : Epoll_Event_Ptr) return C.int;
+                                Event : access Epoll_Event) return C.int;
 
         function Epoll_Wait (Epoll_Descriptor : C.int;
-                                Events : Epoll_Event_Ptr;
+                                Events : access Epoll_Event;
                                 Max_Events : C.int;
                                 Timeout : C.int) return C.int;
 
 
-
-        pragma Import (C, Epoll_Create);
-        pragma Import (C, Epoll_Ctl);
-        pragma Import (C, Epoll_Wait);
+        pragma Import (C, Epoll_Create, "epoll_create");
+        pragma Import (C, Epoll_Ctl, "epoll_ctl");
+        pragma Import (C, Epoll_Wait, "epoll_wait");
 end Epoll;
