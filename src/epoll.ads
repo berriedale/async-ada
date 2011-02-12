@@ -12,7 +12,7 @@ use Interfaces;
 package Epoll is
     type Callback is access procedure (Descriptor : C.int);
     -- My_Callback.all (Fd);
-    package Callback_Registry is new Vectors (C.int, Callback);
+    package Callback_Registry is new Vectors (Natural, Callback);
 
 
     type Hub is tagged private;
@@ -27,6 +27,7 @@ package Epoll is
     Hub_Create_Failed : exception;
     Hub_Invalid : exception;
     Descriptor_Registration_Falied : exception;
+    Invalid_Descriptor : exception;
 
     private
         use Interfaces.C;

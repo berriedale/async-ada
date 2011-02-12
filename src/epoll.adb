@@ -11,6 +11,10 @@ package body Epoll is
     begin
         Validate_Hub (This);
 
+        if Descriptor <= 0 then
+            raise Invalid_Descriptor;
+        end if;
+
         Event.Events := EPOLLIN;
         Event.Data.Fd := Descriptor;
 
@@ -24,7 +28,7 @@ package body Epoll is
             end if;
         end;
 
-        Callback_Registry.Insert (This.Callbacks, Descriptor, Cb);
+        Callback_Registry.Insert (This.Callbacks, Natural(Descriptor), Cb);
     end Register;
 
     procedure Run (This : in Hub) is
