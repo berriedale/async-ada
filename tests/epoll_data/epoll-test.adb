@@ -24,7 +24,10 @@ procedure Epoll.Test is
     end Passed;
 
     function Fd_Of_One return Epoll_Data;
+    function U32_Of_Two return Epoll_Data;
+
     pragma Import (C, Fd_Of_One, "fd_of_one");
+    pragma Import (C, U32_Of_Two, "u32_of_two");
 begin
     Put_Line(">>> Starting tests of epoll_data");
     New_Line;
@@ -38,6 +41,17 @@ begin
                 Failed;
             end if;
         end Fd_Test;
+    Passed;
+
+    Start ("U32_Test");
+    U32_Test:
+        declare
+            Data : Epoll_Data := U32_Of_Two;
+        begin
+            if Data.u32 /= 2 then
+                Failed;
+            end if;
+        end U32_Test;
     Passed;
 
 end Epoll.Test;

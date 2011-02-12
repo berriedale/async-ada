@@ -8,3 +8,9 @@ epoll_data_t fd_of_one() {
     return rc;
 }
 
+epoll_data_t u32_of_two() {
+    epoll_data_t rc;
+    rc.u32 = 2;
+    return rc;
+}
+
