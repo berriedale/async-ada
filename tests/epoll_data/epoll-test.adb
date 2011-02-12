@@ -1,9 +1,11 @@
 
+with System;
 with Ada.Text_IO;
 with Interfaces.C;
 with Epoll;
 
 use Ada.Text_IO;
+use System;
 
 procedure Epoll.Test is
     Test_Failed : exception;
@@ -25,9 +27,13 @@ procedure Epoll.Test is
 
     function Fd_Of_One return Epoll_Data;
     function U32_Of_Two return Epoll_Data;
+    function U64_Of_Lots return Epoll_Data;
+    function Bad_Pointer return Epoll_Data;
 
     pragma Import (C, Fd_Of_One, "fd_of_one");
     pragma Import (C, U32_Of_Two, "u32_of_two");
+    pragma Import (C, U64_Of_Lots, "u64_of_lots");
+    pragma Import (C, Bad_Pointer, "badpointer");
 begin
     Put_Line(">>> Starting tests of epoll_data");
     New_Line;
@@ -54,4 +60,14 @@ begin
         end U32_Test;
     Passed;
 
+    Start ("U64_Test");
+    U64_Test:
+        declare
+            Data : Epoll_Data := U64_Of_Lots;
+        begin
+            if Data.u64 /= 23 then
+                Failed;
+            end if;
+        end U64_Test;
+    Passed;
 end Epoll.Test;
