@@ -29,7 +29,18 @@ package body Epoll is
 
     procedure Run (This : in Hub) is
     begin
-        null;
+        Validate_Hub (This);
+
+        while This.Should_Continue loop
+            Wait_Loop :
+                declare
+                    Events : Epoll_Event_Array(0 .. 10);
+                    Num_Descriptors : C.int := Epoll_Wait (This.Epoll_Fd, Events, 10, -1);
+                begin
+                    null;
+                end Wait_Loop;
+        end loop;
+
     end Run;
 
     function Create return Hub is

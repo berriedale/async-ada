@@ -88,6 +88,7 @@ package Epoll is
             Data : Epoll_Data;
         end record;
         pragma Convention (C_Pass_By_Copy, Epoll_Event);
+        type Epoll_Event_Array is array (C.size_t range <>) of aliased Epoll_Event;
 
 
         function Epoll_Create (Size : C.int) return C.int;
@@ -98,7 +99,7 @@ package Epoll is
                                 Event : access Epoll_Event) return C.int;
 
         function Epoll_Wait (Epoll_Descriptor : C.int;
-                                Events : access Epoll_Event;
+                                Events : Epoll_Event_Array;
                                 Max_Events : C.int;
                                 Timeout : C.int) return C.int;
 
