@@ -1,10 +1,30 @@
+--
+--  epoll.adb - Loose binding on top of the epoll(7) interface in the Linux
+--  kernel
+--
 
 
 package body Epoll is
 
-    procedure Register (This : in Hub; Descriptor : in C.int) is
+    procedure Register (This : in out Hub; Descriptor : in C.int; Cb : in Callback) is
+        Event : aliased Epoll_Event;
     begin
-        null;
+        Validate_Hub (This);
+
+        Event.Events := EPOLLIN;
+        Event.Data.Fd := Descriptor;
+
+        declare
+            Status : C.int;
+        begin
+            Status := Epoll_Ctl (This.Epoll_fd, EPOLL_CTL_ADD, Descriptor, Event'Access);
+
+            if Status = -1 then
+                raise Descriptor_Registration_Falied;
+            end if;
+        end;
+
+        Callback_Registry.Insert (This.Callbacks, Descriptor, Cb);
     end Register;
 
     procedure Run (This : in Hub) is
@@ -28,5 +48,12 @@ package body Epoll is
 
         return Created_Hub;
     end Create;
+
+    procedure Validate_Hub (H : in Hub) is
+    begin
+        if H.Epoll_Fd < 0 then
+            raise Hub_Invalid;
+        end if;
+    end Validate_Hub;
 
 end Epoll;

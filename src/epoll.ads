@@ -4,28 +4,43 @@
 
 with Interfaces.C;
 with System;
+with Ada.Containers.Vectors;
 
+use Ada.Containers;
 use Interfaces;
 
 package Epoll is
     type Callback is access procedure (Descriptor : C.int);
     -- My_Callback.all (Fd);
+    package Callback_Registry is new Vectors (C.int, Callback);
+
 
     type Hub is tagged private;
 
-    procedure Register (This : in Hub; Descriptor : C.int);
+    procedure Register (This : in out Hub;
+                            Descriptor : in C.int;
+                            Cb : in Callback);
     procedure Run (This : in Hub);
 
     function Create return Hub;
 
     Hub_Create_Failed : exception;
+    Hub_Invalid : exception;
+    Descriptor_Registration_Falied : exception;
 
     private
         use Interfaces.C;
 
+        --  Callback_Registry will be used to determine "who" to invoke when a
+        --  specific descriptor receives data in the `Run` loop
+
         type Hub is tagged record
             Epoll_Fd : C.int := -1;
+            Should_Continue : Boolean := True;
+            Callbacks : Callback_Registry.Vector;
         end record;
+
+        procedure Validate_Hub (H: in Hub);
 
         subtype EPOLL_CTL_OPS is C.unsigned;
         EPOLL_CTL_ADD : constant EPOLL_CTL_OPS := 1;
@@ -58,18 +73,18 @@ package Epoll is
                 when Pointer =>
                     Ptr : System.Address;
                 when File_Descriptor =>
-                    Fd : C.int;
+                    Fd : aliased C.int;
                 when Int_32 =>
-                    u32 : C.int;
+                    u32 : aliased C.int;
                 when Int_64 =>
-                    u64 : C.int;
+                    u64 : aliased C.int;
             end case;
         end record;
         pragma Convention (C_Pass_By_Copy, Epoll_Data);
         pragma Unchecked_Union (Epoll_Data);
 
         type Epoll_Event is record
-            Events : Integer;
+            Events : aliased C.unsigned;
             Data : Epoll_Data;
         end record;
         pragma Convention (C_Pass_By_Copy, Epoll_Event);
