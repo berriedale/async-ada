@@ -64,11 +64,21 @@ package body Epoll is
         return Created_Hub;
     end Create;
 
+
     procedure Validate_Hub (H : in Hub) is
     begin
+        Debug_Trace (H, "Entering Validate_Hub");
         if H.Epoll_Fd < 0 then
             raise Hub_Invalid;
         end if;
     end Validate_Hub;
+
+
+    procedure Debug_Trace (H : in Hub; Line : in String) is
+    begin
+        if not H.Debug then
+            return;
+        end if;
+    end Debug_Trace;
 
 end Epoll;

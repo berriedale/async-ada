@@ -38,10 +38,12 @@ package Epoll is
         type Hub is tagged record
             Epoll_Fd : C.int := -1;
             Should_Continue : Boolean := True;
+            Debug : Boolean := False;
             Callbacks : Callback_Registry.Vector;
         end record;
 
         procedure Validate_Hub (H: in Hub);
+        procedure Debug_Trace (H: in Hub; Line : in String);
 
         subtype EPOLL_CTL_OPS is C.unsigned;
         EPOLL_CTL_ADD : constant EPOLL_CTL_OPS := 1;
