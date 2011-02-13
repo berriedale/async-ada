@@ -2,16 +2,21 @@ GPRBUILD=gprbuild
 GPRCLEAN=gprclean
 TESTRUNNER=testrunner
 
-lib:
-	mkdir -p build
+lib: pre
 	$(GPRBUILD) -p epoll.gpr
 
-syntax:
-	mkdir -p build
+syntax: pre
 	gnatmake -gnatc -gnat05 -P epoll.gpr
 
-clean:
+clean: pre
+	for d in tests/*; do echo "> $$d"; (cd $$d && make clean); done
 	$(GPRCLEAN) epoll.gpr
 	rm -rf build
 
-.PHONY: syntax lib
+pre:
+	mkdir -p build
+
+test: pre lib
+	for d in tests/*; do echo "> $$d"; (cd $$d && make run); done
+
+.PHONY: syntax lib test
