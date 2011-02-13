@@ -28,6 +28,7 @@ package Epoll is
     Hub_Invalid : exception;
     Descriptor_Registration_Falied : exception;
     Invalid_Descriptor : exception;
+    Epoll_Wait_Failure : exception;
 
     private
         use Interfaces.C;
@@ -37,6 +38,7 @@ package Epoll is
 
         type Hub is tagged record
             Epoll_Fd : C.int := -1;
+            Timeout : C.int := -1;
             Should_Continue : Boolean := True;
             Debug : Boolean := False;
             Callbacks : Callback_Registry.Vector;

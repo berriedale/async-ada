@@ -31,6 +31,7 @@ package body Epoll is
         Callback_Registry.Insert (This.Callbacks, Natural(Descriptor), Cb);
     end Register;
 
+
     procedure Run (This : in Hub) is
     begin
         Validate_Hub (This);
@@ -38,14 +39,25 @@ package body Epoll is
         while This.Should_Continue loop
             Wait_Loop :
                 declare
-                    Events : Epoll_Event_Array(0 .. 10);
-                    Num_Descriptors : C.int := Epoll_Wait (This.Epoll_Fd, Events, 10, -1);
+                    Max_Events : constant C.int := 10;
+                    Events : Epoll_Event_Array(0 .. C.size_t (Max_Events));
+                    Num_Descriptors : C.int := Epoll_Wait (This.Epoll_Fd,
+                                                            Events,
+                                                            Max_Events,
+                                                            This.Timeout);
                 begin
-                    null;
+                    if Num_Descriptors < 0 then
+                        raise Epoll_Wait_Failure;
+                    end if;
+
+                    for Index in 0 .. Num_Descriptors loop
+                        null; -- Do stuff
+                    end loop;
                 end Wait_Loop;
         end loop;
 
     end Run;
+
 
     function Create return Hub is
         Created_Hub : Hub;
