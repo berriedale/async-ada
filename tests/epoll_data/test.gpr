@@ -1,4 +1,4 @@
-with "../../epoll.gpr";
+with "../../async.gpr";
 
 project Test is
     for Languages use ("C", "Ada");

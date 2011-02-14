@@ -2,15 +2,17 @@ GPRBUILD=gprbuild
 GPRCLEAN=gprclean
 TESTRUNNER=testrunner
 
+PROJECTGPR=async.gpr
+
 lib: pre
-	$(GPRBUILD) -p epoll.gpr
+	$(GPRBUILD) -p $(PROJECTGPR)
 
 syntax: pre
-	gnatmake -gnatc -gnat05 -P epoll.gpr
+	gnatmake -gnatc -gnat05 -P $(PROJECTGPR)
 
 clean: pre
 	for d in tests/*; do echo "> $$d"; (cd $$d && make clean); done
-	$(GPRCLEAN) epoll.gpr
+	$(GPRCLEAN) $(PROJECTGPR)
 	rm -rf build
 
 pre:
