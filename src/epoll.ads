@@ -2,18 +2,18 @@
 --  Main interface for dealing with epoll(7) from Ada
 --
 
-with Interfaces.C;
-with System;
-with Ada.Containers.Vectors;
+with Interfaces.C,
+    Ada.Containers.Vectors;
 
-use Ada.Containers;
-use Interfaces;
+use Ada.Containers,
+    Interfaces;
+
+private with System;
 
 package Epoll is
     type Callback is access procedure (Descriptor : C.int);
     -- My_Callback.all (Fd);
     package Callback_Registry is new Vectors (Natural, Callback);
-
 
     type Hub is tagged private;
 
