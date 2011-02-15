@@ -6,7 +6,9 @@
 
 package body Epoll is
 
-    procedure Register (This : in out Hub; Descriptor : in C.int; Cb : in Callback) is
+    procedure Register (This : in out Hub;
+                        Descriptor : in C.int;
+                        Cb : in Callback_Tuple) is
         Event : aliased Epoll_Event;
     begin
         Validate_Hub (This);
