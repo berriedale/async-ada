@@ -53,7 +53,17 @@ package body Epoll is
                     end if;
 
                     for Index in 0 .. Num_Descriptors loop
-                        null; -- Do stuff
+                        declare
+                            Event : constant Epoll_Event :=
+                                                    Events (C.size_t (Index));
+                            Descriptor : constant C.int :=
+                                                    Event.Data.Fd;
+                            Cb : constant Callback_Tuple :=
+                                                    Callback_Registry.Element (This.Callbacks,
+                                                                                Natural (Descriptor));
+                        begin
+                            Cb.Callback.all (Descriptor, Cb.Context);
+                        end;
                     end loop;
                 end Wait_Loop;
         end loop;
