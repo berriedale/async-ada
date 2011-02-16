@@ -10,7 +10,7 @@ use Ada.Containers,
 
 private with System;
 
-package Epoll is
+package Async.Epoll is
     type Context_Type is tagged null record;
     type Callback_Type is access procedure (Descriptor : C.int; Context : Context_Type);
 
@@ -122,4 +122,4 @@ package Epoll is
         pragma Import (C, Epoll_Create, "epoll_create");
         pragma Import (C, Epoll_Ctl, "epoll_ctl");
         pragma Import (C, Epoll_Wait, "epoll_wait");
-end Epoll;
+end Async.Epoll;

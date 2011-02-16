@@ -4,7 +4,7 @@
 --
 
 
-package body Epoll is
+package body Async.Epoll is
 
     procedure Register (This : in out Hub;
                         Descriptor : in C.int;
@@ -105,4 +105,4 @@ package body Epoll is
         end if;
     end Debug_Trace;
 
-end Epoll;
+end Async.Epoll;
