@@ -2,12 +2,12 @@
 with System;
 with Ada.Text_IO;
 with Interfaces.C;
-with Epoll;
+with Async.Epoll;
 
 use Ada.Text_IO;
 use System;
 
-procedure Epoll.Test is
+procedure Async.Epoll.Test is
     Test_Failed : exception;
 
     procedure Start (Name : in String) is
@@ -70,4 +70,4 @@ begin
             end if;
         end U64_Test;
     Passed;
-end Epoll.Test;
+end Async.Epoll.Test;
