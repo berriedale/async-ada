@@ -2,22 +2,24 @@
 --  Main interface for dealing with epoll(7) from Ada
 --
 
-with Interfaces.C,
-    Ada.Containers.Vectors;
+with Ada.Containers.Vectors,
+        Interfaces.C,
+        GNAT.Sockets;
 
-use Ada.Containers,
-    Interfaces;
+use Interfaces,
+    Ada.Containers;
 
 private with System;
 
 package Async.Epoll is
     type Context_Type is tagged null record;
-    type Callback_Type is access procedure (Descriptor : C.int; Context : Context_Type);
+    type Callback_Type is access procedure (Sock : GNAT.Sockets.Socket_Type; Context : Context_Type);
 
     -- Callback_Tuple is just an arbitrary record to carry the Callback_Type
     -- and the Context_Type to be passed into that Callback_Type along through
     -- the Callback_Registry.
     type Callback_Tuple is record
+        Socket : GNAT.Sockets.Socket_Type;
         Callback : Callback_Type;
         Context : Context_Type;
     end record;
@@ -28,7 +30,6 @@ package Async.Epoll is
     type Hub is tagged private;
 
     procedure Register (This : in out Hub;
-                        Descriptor : in C.int;
                         Cb : in Callback_Tuple);
     procedure Run (This : in Hub);
 

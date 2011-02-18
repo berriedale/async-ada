@@ -7,9 +7,9 @@
 package body Async.Epoll is
 
     procedure Register (This : in out Hub;
-                        Descriptor : in C.int;
                         Cb : in Callback_Tuple) is
         Event : aliased Epoll_Event;
+        Descriptor : constant C.int := C.int (GNAT.Sockets.To_C (Cb.Socket));
     begin
         Validate_Hub (This);
 
@@ -62,7 +62,7 @@ package body Async.Epoll is
                                                     Callback_Registry.Element (This.Callbacks,
                                                                                 Natural (Descriptor));
                         begin
-                            Cb.Callback.all (Descriptor, Cb.Context);
+                            Cb.Callback.all (Cb.Socket, Cb.Context);
                         end;
                     end loop;
                 end Wait_Loop;
