@@ -34,6 +34,7 @@ package Async.Epoll is
     procedure Run (This : in Hub);
 
     function Create return Hub;
+    procedure Enable_Tracing (H : in out Hub);
 
     Hub_Create_Failed : exception;
     Hub_Invalid : exception;

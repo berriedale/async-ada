@@ -4,6 +4,10 @@
 --
 
 
+private with Ada.Text_IO;
+
+use Ada.Text_IO;
+
 package body Async.Epoll is
 
     procedure Register (This : in out Hub;
@@ -12,6 +16,8 @@ package body Async.Epoll is
         Descriptor : constant C.int := C.int (GNAT.Sockets.To_C (Cb.Socket));
     begin
         Validate_Hub (This);
+
+        This.Debug_Trace ("<Register>> The Hub is valid");
 
         if Descriptor <= 0 then
             raise Invalid_Descriptor;
@@ -28,7 +34,12 @@ package body Async.Epoll is
             if Status = -1 then
                 raise Descriptor_Registration_Falied;
             end if;
+
+            This.Debug_Trace ("<Register>> Successfully added to the Epoll_Fd");
         end;
+
+        This.Debug_Trace ("<Register>> Inserting descriptor:" &
+                                    Natural'Image (Natural (descriptor)));
 
         Callback_Registry.Insert (This.Callbacks, Natural(Descriptor), Cb);
     end Register;
@@ -91,18 +102,22 @@ package body Async.Epoll is
 
     procedure Validate_Hub (H : in Hub) is
     begin
-        Debug_Trace (H, "Entering Validate_Hub");
         if H.Epoll_Fd < 0 then
             raise Hub_Invalid;
         end if;
     end Validate_Hub;
 
+    procedure Enable_Tracing (H : in out Hub) is
+    begin
+        H.Debug := True;
+    end Enable_Tracing;
 
     procedure Debug_Trace (H : in Hub; Line : in String) is
     begin
         if not H.Debug then
             return;
         end if;
+        Put_Line (Line);
     end Debug_Trace;
 
 end Async.Epoll;
