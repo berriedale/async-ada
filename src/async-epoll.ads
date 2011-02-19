@@ -2,7 +2,7 @@
 --  Main interface for dealing with epoll(7) from Ada
 --
 
-with Ada.Containers.Vectors,
+with Ada.Containers.Hashed_Maps,
         Interfaces.C,
         GNAT.Sockets;
 
@@ -24,8 +24,15 @@ package Async.Epoll is
         Context : Context_Type;
     end record;
 
+    function Descriptor_Hash (Id : in C.int) return Hash_Type;
+
     -- My_Callback.all (Fd);
-    package Callback_Registry is new Vectors (Natural, Callback_Tuple);
+    use Interfaces.C;
+    package Callback_Registry is new Hashed_Maps (Key_Type => C.int,
+                                            Element_Type => Callback_Tuple,
+                                            Hash => Descriptor_Hash,
+                                            Equivalent_Keys => "="
+                                            );
 
     type Hub is tagged private;
 
@@ -53,7 +60,7 @@ package Async.Epoll is
             Timeout : C.int := -1;
             Should_Continue : Boolean := True;
             Debug : Boolean := False;
-            Callbacks : Callback_Registry.Vector;
+            Callbacks : Callback_Registry.Map;
         end record;
 
         procedure Validate_Hub (H: in Hub);

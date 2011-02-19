@@ -4,7 +4,8 @@
 --
 
 
-private with Ada.Text_IO;
+private with Ada.Strings.Hash,
+            Ada.Text_IO;
 
 use Ada.Text_IO;
 
@@ -14,6 +15,7 @@ package body Async.Epoll is
                         Cb : in Callback_Tuple) is
         Event : aliased Epoll_Event;
         Descriptor : constant C.int := C.int (GNAT.Sockets.To_C (Cb.Socket));
+        Descriptor_Str : constant String := Natural'Image (Natural(Descriptor));
     begin
         Validate_Hub (This);
 
@@ -35,13 +37,13 @@ package body Async.Epoll is
                 raise Descriptor_Registration_Falied;
             end if;
 
-            This.Debug_Trace ("<Register>> Successfully added to the Epoll_Fd");
+            This.Debug_Trace ("<Register>> Successfully added descriptor:" &
+                                    Descriptor_Str & " to the Epoll_Fd");
         end;
 
-        This.Debug_Trace ("<Register>> Inserting descriptor:" &
-                                    Natural'Image (Natural (descriptor)));
+        This.Debug_Trace ("<Register>> Inserting descriptor:" & Descriptor_Str);
 
-        Callback_Registry.Insert (This.Callbacks, Natural(Descriptor), Cb);
+        Callback_Registry.Insert (This.Callbacks, Descriptor, Cb);
     end Register;
 
 
@@ -71,7 +73,7 @@ package body Async.Epoll is
                                                     Event.Data.Fd;
                             Cb : constant Callback_Tuple :=
                                                     Callback_Registry.Element (This.Callbacks,
-                                                                                Natural (Descriptor));
+                                                                                Descriptor);
                         begin
                             Cb.Callback.all (Cb.Socket, Cb.Context);
                         end;
@@ -119,5 +121,10 @@ package body Async.Epoll is
         end if;
         Put_Line (Line);
     end Debug_Trace;
+
+    function Descriptor_Hash (Id : in C.int) return Hash_Type is
+    begin
+        return Ada.Strings.Hash (C.int'Image (Id));
+    end Descriptor_Hash;
 
 end Async.Epoll;
