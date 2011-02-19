@@ -51,7 +51,11 @@ package body Async.Epoll is
     begin
         Validate_Hub (This);
 
+        This.Debug_Trace ("<Run>> The Hub is valid");
+
         while This.Should_Continue loop
+            This.Debug_Trace ("<Run>> Continuing run loop");
+
             Wait_Loop :
                 declare
                     Max_Events : constant C.int := 10;
@@ -65,19 +69,27 @@ package body Async.Epoll is
                         raise Epoll_Wait_Failure;
                     end if;
 
-                    for Index in 0 .. Num_Descriptors loop
-                        declare
-                            Event : constant Epoll_Event :=
-                                                    Events (C.size_t (Index));
-                            Descriptor : constant C.int :=
-                                                    Event.Data.Fd;
-                            Cb : constant Callback_Tuple :=
-                                                    Callback_Registry.Element (This.Callbacks,
-                                                                                Descriptor);
-                        begin
-                            Cb.Callback.all (Cb.Socket, Cb.Context);
-                        end;
-                    end loop;
+                    This.Debug_Trace ("<Run>> Epoll_Wait returned with changes on" &
+                                            C.int'Image (Num_Descriptors) &
+                                            " descriptors");
+
+                    if Num_Descriptors > 0 then
+                        for Index in 0 .. (Num_Descriptors - 1) loop
+                            This.Debug_Trace ("<Run>> Descriptor loop, index:" & C.int'Image (Index));
+
+                            declare
+                                Event : constant Epoll_Event :=
+                                                        Events (C.size_t (Index));
+                                Descriptor : constant C.int :=
+                                                        Event.Data.Fd;
+                                Cb : constant Callback_Tuple :=
+                                                        Callback_Registry.Element (This.Callbacks,
+                                                                                    Descriptor);
+                            begin
+                                Cb.Callback.all (Cb.Socket, Cb.Context);
+                            end;
+                        end loop;
+                    end if;
                 end Wait_Loop;
         end loop;
 
