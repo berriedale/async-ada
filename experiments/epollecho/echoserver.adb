@@ -19,7 +19,9 @@ procedure echoserver is
     Listen_Addr : constant String := "127.0.0.1";
     Listen_Port : constant Integer := 2046;
 
-    The_Hub : Async.Epoll.Hub := Async.Epoll.Create;
+    package Epoll is new Async.Epoll (Context_Type => Echo.Echo_State);
+
+    The_Hub : Epoll.Hub := Epoll.Create;
 
 begin
     Initialize; -- Initialize the GNAT.Sockets library
@@ -37,7 +39,7 @@ begin
     Put_Line (".. listening for connections");
 
     declare
-        Ctx : Async.Epoll.Callback_Tuple;
+        Ctx : Epoll.Callback_Tuple;
         State : Echo.Echo_State;
     begin
         The_Hub.Enable_Tracing;

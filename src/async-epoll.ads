@@ -11,8 +11,10 @@ use Interfaces,
 
 private with System;
 
+generic
+    type Context_Type is private;
+
 package Async.Epoll is
-    type Context_Type is tagged null record;
     type Callback_Type is access procedure (Sock : GNAT.Sockets.Socket_Type; Context : Context_Type);
 
     -- Callback_Tuple is just an arbitrary record to carry the Callback_Type
