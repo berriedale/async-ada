@@ -23,6 +23,6 @@ pre:
 
 test: pre lib
 	for d in experiments/*; do echo "> $$d"; (cd $$d && make); done
-	for d in tests/*; do echo "> $$d"; (cd $$d && make run); done
+#	for d in tests/*; do echo "> $$d"; (cd $$d && make run); done
 
 .PHONY: syntax lib test
