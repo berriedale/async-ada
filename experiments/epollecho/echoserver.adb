@@ -5,11 +5,12 @@ private with Ada.Text_IO;
 private with Ada.Streams;
 private with GNAT.Sockets;
 private with Async.Epoll;
-private with Echo;
+with Echo;
 
 use Ada.Text_IO;
 use Ada.Streams;
 use GNAT.Sockets;
+use Echo;
 
 procedure echoserver is
     ServerSock : Socket_Type;
@@ -39,14 +40,13 @@ begin
     Put_Line (".. listening for connections");
 
     declare
-        Ctx : Epoll.Callback_Tuple;
-        State : Echo.Echo_State;
+        State : Echo_State := Echo_State'(Server_Addr => ServerAddr,
+                                            Listening_Socket => ServerSock);
+        Ctx : Epoll.Callback_Tuple := Epoll.Callback_Tuple'(Socket => ServerSock,
+                                            Context => State,
+                                            Callback => Call_Me_Back'Access);
     begin
         The_Hub.Enable_Tracing;
-        State.Server_Addr := ServerAddr;
-        Ctx.Callback := Echo.Call_Me_Back'Access;
-        Ctx.Socket := ServerSock;
-        Ctx.Context := State;
         The_Hub.Register (Ctx);
         The_Hub.Run;
     end;

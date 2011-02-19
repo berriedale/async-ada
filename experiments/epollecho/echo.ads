@@ -1,9 +1,12 @@
-with GNAT.Sockets;
-with Async.Epoll;
+with GNAT.Sockets,
+            Async.Epoll;
+
+use GNAT.Sockets;
 
 package Echo is
     type Echo_State is record
-        Server_Addr : GNAT.Sockets.Sock_Addr_Type;
+        Server_Addr : Sock_Addr_Type;
+        Listening_Socket : Socket_Type;
     end record;
 
     procedure Call_Me_Back (Sock : GNAT.Sockets.Socket_Type;
