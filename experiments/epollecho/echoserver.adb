@@ -38,12 +38,17 @@ begin
 
     declare
         Ctx : Async.Epoll.Callback_Tuple;
+        State : Echo.Echo_State;
     begin
         The_Hub.Enable_Tracing;
+        State.Server_Addr := ServerAddr;
         Ctx.Callback := Echo.Call_Me_Back'Access;
         Ctx.Socket := ServerSock;
+        Ctx.Context := State;
         The_Hub.Register (Ctx);
+        The_Hub.Run;
     end;
+    return;
 
     loop
         Accept_Socket (ServerSock, ClientSock, ServerAddr);
