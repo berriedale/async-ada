@@ -1,0 +1,6 @@
+= Async Ada
+
+The Async Ada library provides interfaces on top of operating system primitives
+for writing highly concurrent I/O-based applications in Ada. 
+
+
